@@ -1,26 +1,22 @@
-name: Send GitHub Message
+name: GitHub Message Sender (No CLI)
 
-# Trigger events
 on:
-  workflow_dispatch: # Allows manual trigger
+  workflow_dispatch: # manual trigger
   schedule:
-    - cron: "0 9 * * *" # Optional: runs every day at 9 AM UTC
+    - cron: "0 9 * * *" # optional: daily at 9 AM UTC
 
 jobs:
   send_message:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Setup GitHub CLI
-      - name: Setup GitHub CLI
-        uses: actions/setup-gh-cli@v2
-
-      # Step 2: Create an Issue (message)
-      - name: Create Message Issue
+      - name: Send GitHub Message via REST API
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          gh issue create \
-            --repo $GITHUB_REPOSITORY \
-            --title "Hello from GitHub!" \
-            --body "This is your GitHub message. No SMTP or API used!"
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/$REPO/issues \
+            -d '{"title":"🚀 Your Daily GitHub Message","body":"Hello! This is a GitHub-generated message. All watchers of this repo will get a notification automatically."}'
