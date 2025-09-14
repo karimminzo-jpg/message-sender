@@ -1,0 +1,26 @@
+name: Send GitHub Message
+
+# Trigger events
+on:
+  workflow_dispatch: # Allows manual trigger
+  schedule:
+    - cron: "0 9 * * *" # Optional: runs every day at 9 AM UTC
+
+jobs:
+  send_message:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Setup GitHub CLI
+      - name: Setup GitHub CLI
+        uses: actions/setup-gh-cli@v2
+
+      # Step 2: Create an Issue (message)
+      - name: Create Message Issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --repo $GITHUB_REPOSITORY \
+            --title "Hello from GitHub!" \
+            --body "This is your GitHub message. No SMTP or API used!"
